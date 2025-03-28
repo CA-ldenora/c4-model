@@ -30,11 +30,11 @@ const edgeTypes: EdgeTypes = {
 };
 
 const initialNodes: Node[] = [
-  // C4 Model nodes
+  // C4 Model nodes - Positioned on the left side
   {
     id: 'actor-1',
     type: 'actor',
-    position: { x: 250, y: 0 },
+    position: { x: 100, y: 50 },
     data: { 
       title: 'Utente',
       type: 'Persona',
@@ -44,7 +44,7 @@ const initialNodes: Node[] = [
   {
     id: 'web-1',
     type: 'web',
-    position: { x: 250, y: 150 },
+    position: { x: 100, y: 200 },
     data: {
       title: 'Applicazione Web',
       type: 'Container',
@@ -54,7 +54,7 @@ const initialNodes: Node[] = [
   {
     id: 'sistema-1',
     type: 'sistema',
-    position: { x: 250, y: 300 },
+    position: { x: 100, y: 350 },
     data: {
       title: 'API Backend',
       type: 'Container',
@@ -64,18 +64,18 @@ const initialNodes: Node[] = [
   {
     id: 'database-1',
     type: 'database',
-    position: { x: 250, y: 450 },
+    position: { x: 100, y: 500 },
     data: {
       title: 'Database',
       type: 'Container',
       description: 'Memorizza i dati dell\'applicazione'
     }
   },
-  // UML Class Diagram nodes
+  // UML Class Diagram nodes - Positioned on the right side
   {
     id: 'bank',
     type: 'class',
-    position: { x: 100, y: 50 },
+    position: { x: 600, y: 50 },
     data: {
       title: 'Bank',
       type: 'class',
@@ -90,7 +90,7 @@ const initialNodes: Node[] = [
   {
     id: 'teller',
     type: 'class',
-    position: { x: 500, y: 50 },
+    position: { x: 1000, y: 50 },
     data: {
       title: 'Teller',
       type: 'class',
@@ -111,7 +111,7 @@ const initialNodes: Node[] = [
   {
     id: 'customer',
     type: 'class',
-    position: { x: 100, y: 300 },
+    position: { x: 600, y: 250 },
     data: {
       title: 'Customer',
       type: 'class',
@@ -136,7 +136,7 @@ const initialNodes: Node[] = [
   {
     id: 'account',
     type: 'class',
-    position: { x: 500, y: 300 },
+    position: { x: 1000, y: 250 },
     data: {
       title: 'Account',
       type: 'class',
@@ -150,7 +150,7 @@ const initialNodes: Node[] = [
   {
     id: 'checking',
     type: 'class',
-    position: { x: 800, y: 200 },
+    position: { x: 800, y: 400 },
     data: {
       title: 'Checking',
       type: 'class',
@@ -164,7 +164,7 @@ const initialNodes: Node[] = [
   {
     id: 'savings',
     type: 'class',
-    position: { x: 800, y: 400 },
+    position: { x: 1200, y: 400 },
     data: {
       title: 'Savings',
       type: 'class',
@@ -178,7 +178,7 @@ const initialNodes: Node[] = [
   {
     id: 'loan',
     type: 'class',
-    position: { x: 500, y: 500 },
+    position: { x: 600, y: 450 },
     data: {
       title: 'Loan',
       type: 'class',
@@ -194,7 +194,7 @@ const initialNodes: Node[] = [
   {
     id: 'interface-payment',
     type: 'interface',
-    position: { x: 800, y: 150 },
+    position: { x: 1200, y: 150 },
     data: {
       title: 'IPayment',
       type: 'interface',
@@ -209,7 +209,7 @@ const initialNodes: Node[] = [
   {
     id: 'enum-status',
     type: 'enum',
-    position: { x: 800, y: 350 },
+    position: { x: 1200, y: 250 },
     data: {
       title: 'OrderStatus',
       type: 'enum',
@@ -231,7 +231,7 @@ const initialEdges: Edge[] = [
     id: 'e1-2', 
     source: 'actor-1', 
     target: 'web-1',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '1',
       targetLabel: 'n'
@@ -249,7 +249,7 @@ const initialEdges: Edge[] = [
     id: 'e2-3', 
     source: 'web-1', 
     target: 'sistema-1',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '1',
       targetLabel: '1'
@@ -267,7 +267,7 @@ const initialEdges: Edge[] = [
     id: 'e3-4', 
     source: 'sistema-1', 
     target: 'database-1',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '1',
       targetLabel: '1'
@@ -286,7 +286,7 @@ const initialEdges: Edge[] = [
     id: 'bank-teller',
     source: 'bank',
     target: 'teller',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+1..*'
@@ -303,7 +303,7 @@ const initialEdges: Edge[] = [
     id: 'bank-customer',
     source: 'bank',
     target: 'customer',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+1..*'
@@ -320,7 +320,7 @@ const initialEdges: Edge[] = [
     id: 'customer-teller',
     source: 'customer',
     target: 'teller',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '+1..*',
       targetLabel: '+1..*'
@@ -337,7 +337,7 @@ const initialEdges: Edge[] = [
     id: 'customer-account',
     source: 'customer',
     target: 'account',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+1..*'
@@ -354,7 +354,7 @@ const initialEdges: Edge[] = [
     id: 'account-checking',
     source: 'account',
     target: 'checking',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+1'
@@ -371,7 +371,7 @@ const initialEdges: Edge[] = [
     id: 'account-savings',
     source: 'account',
     target: 'savings',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+1'
@@ -388,7 +388,7 @@ const initialEdges: Edge[] = [
     id: 'customer-loan',
     source: 'customer',
     target: 'loan',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+0..*'
@@ -405,7 +405,7 @@ const initialEdges: Edge[] = [
     id: 'e-order-payment',
     source: 'customer',
     target: 'interface-payment',
-    type: 'uml',
+    type: 'smoothstep',
     data: { 
       sourceLabel: '1',
       targetLabel: '1'
