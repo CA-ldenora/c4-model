@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Handle, Position} from "@xyflow/react"
 ;
-import "./SistemaStyle.css";
+import "./sistemaStyle.css";
 
 
 
