@@ -498,9 +498,76 @@ const getNewNodePosition = (type: string, nodes: Node[]): { x: number; y: number
   };
 };
 
+// Add stress test function
+const generateStressTestData = (count: number) => {
+  const newNodes: Node[] = [];
+  const newEdges: Edge[] = [];
+  const nodeTypes = ['class', 'interface', 'component', 'container', 'database', 'person'];
+  
+  // Generate nodes in a grid layout
+  for (let i = 0; i < count; i++) {
+    const type = nodeTypes[i % nodeTypes.length];
+    const isUML = ['class', 'interface'].includes(type);
+    const row = Math.floor(i / 30); // 30 nodes per row
+    const col = i % 30;
+    
+    const baseX = isUML ? 800 : 100; // UML nodes start from x=800, C4 from x=100
+    const nodeWidth = isUML ? 200 : 180;
+    const nodeHeight = isUML ? 150 : 120;
+    
+    const node: Node = {
+      id: `stress-${i}`,
+      type,
+      position: { 
+        x: baseX + (col * (nodeWidth + 50)), 
+        y: 50 + (row * (nodeHeight + 50))
+      },
+      data: {
+        title: `${type} ${i}`,
+        type,
+        description: `Stress test node ${i}`,
+        attributes: isUML ? ['+ attribute1: string', '+ attribute2: number'] : undefined,
+        methods: isUML ? ['+ method1()', '+ method2()'] : undefined,
+      },
+    };
+    newNodes.push(node);
+    
+    // Create edges between nodes (connecting to previous node)
+    if (i > 0) {
+      const edge: Edge = {
+        id: `stress-edge-${i}`,
+        source: `stress-${i-1}`,
+        target: `stress-${i}`,
+        type: isUML ? 'uml' : 'default',
+        data: isUML ? {
+          sourceLabel: '1',
+          targetLabel: '*'
+        } : undefined,
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: '#333',
+          width: 20,
+          height: 20,
+        },
+        style: { stroke: '#333' }
+      };
+      newEdges.push(edge);
+    }
+  }
+  
+  return { nodes: newNodes, edges: newEdges };
+};
+
 function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  
+  // Add stress test handler
+  const handleStressTest = useCallback(() => {
+    const { nodes: stressNodes, edges: stressEdges } = generateStressTestData(1500);
+    setNodes((nds) => [...nds, ...stressNodes]);
+    setEdges((eds) => [...eds, ...stressEdges]);
+  }, [setNodes, setEdges]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -592,6 +659,35 @@ function App() {
         <MiniMap />
         <C4Toolbar onAddContainer={onAddContainer} />
         <UMLToolbar onAddElement={onAddUMLElement} />
+        <div style={{
+          position: 'absolute',
+          left: 10,
+          top: 413,
+          zIndex: 4,
+          background: 'white',
+          padding: '8px',
+          borderRadius: '4px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          <button
+            onClick={handleStressTest}
+            style={{
+              padding: '8px 16px',
+              background: '#ff4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              width: '100%'
+            }}
+          >
+            Stress Test (1500 Nodi)
+          </button>
+        </div>
       </ReactFlow>
     </div>
   );
