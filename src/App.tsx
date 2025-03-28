@@ -410,71 +410,10 @@ const initialEdges: Edge[] = [
   }
 ];
 
-// Layout configuration
+// Remove the unused layout configuration and functions
+// Settings for the layout
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-// Settings for the layout
-const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
-  const isHorizontal = direction === 'LR';
-  dagreGraph.setGraph({ rankdir: direction });
-
-  // Clear the graph before adding new nodes
-  const existingNodes = dagreGraph.nodes();
-  for (const node of existingNodes) {
-    dagreGraph.removeNode(node);
-  }
-
-  // Separate C4 and UML nodes
-  const c4Nodes = nodes.filter(node => 
-    ['actor', 'sistema', 'exSistema', 'database', 'mobile', 'web'].includes(node.type || '')
-  );
-  const umlNodes = nodes.filter(node => 
-    ['class', 'interface', 'enum', 'abstract', 'package', 'component'].includes(node.type || '')
-  );
-
-  // Add C4 nodes to their graph
-  for (const node of c4Nodes) {
-    dagreGraph.setNode(node.id, { width: 180, height: 120 });
-  }
-
-  // Add UML nodes to their graph
-  for (const node of umlNodes) {
-    dagreGraph.setNode(node.id, { width: 200, height: 150 });
-  }
-
-  // Add edges
-  for (const edge of edges) {
-    dagreGraph.setEdge(edge.source, edge.target);
-  }
-
-  // Calculate the layout
-  dagre.layout(dagreGraph);
-
-  // Fixed starting positions
-  const c4StartX = 100;
-  const umlStartX = 800;
-  
-  // Get the layouted nodes
-  const layoutedNodes = nodes.map((node) => {
-    const isC4Node = c4Nodes.some(n => n.id === node.id);
-    const nodeWithPosition = dagreGraph.node(node.id);
-    
-    if (!nodeWithPosition) {
-      return node;
-    }
-
-    return {
-      ...node,
-      position: {
-        x: isC4Node ? c4StartX : umlStartX + nodeWithPosition.x,
-        y: nodeWithPosition.y,
-      },
-    };
-  });
-
-  return { nodes: layoutedNodes, edges };
-};
 
 const getNewNodePosition = (type: string, nodes: Node[]): { x: number; y: number } => {
   const isC4Node = ['actor', 'sistema', 'exSistema', 'database', 'mobile', 'web'].includes(type);
