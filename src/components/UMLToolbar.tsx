@@ -1,17 +1,17 @@
 import { memo } from 'react';
 
-interface C4ToolbarProps {
-  onAddContainer: (type: string) => void;
+interface UMLToolbarProps {
+  onAddElement: (type: string) => void;
 }
 
-const C4Toolbar = ({ onAddContainer }: C4ToolbarProps) => {
-  const containerTypes = [
-    { type: 'server', label: 'Server App' },
-    { type: 'client', label: 'Client App' },
-    { type: 'database', label: 'Database' },
-    { type: 'mobile', label: 'Mobile App' },
-    { type: 'serverless', label: 'Serverless' },
-    { type: 'blob', label: 'Blob Store' },
+const UMLToolbar = ({ onAddElement }: UMLToolbarProps) => {
+  const umlElements = [
+    { type: 'class', label: 'Classe' },
+    { type: 'interface', label: 'Interfaccia' },
+    { type: 'enum', label: 'Enumerazione' },
+    { type: 'abstract', label: 'Classe Astratta' },
+    { type: 'package', label: 'Package' },
+    { type: 'component', label: 'Componente' },
   ];
 
   return (
@@ -19,7 +19,7 @@ const C4Toolbar = ({ onAddContainer }: C4ToolbarProps) => {
       style={{
         position: 'absolute',
         top: '10px',
-        left: '10px',
+        right: '10px',
         background: 'white',
         padding: '10px',
         borderRadius: '5px',
@@ -27,12 +27,12 @@ const C4Toolbar = ({ onAddContainer }: C4ToolbarProps) => {
         zIndex: 1000,
       }}
     >
-      <h3 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>C4 Containers</h3>
+      <h3 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>Elementi UML</h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-        {containerTypes.map((container) => (
+        {umlElements.map((element) => (
           <button
-            key={container.type}
-            onClick={() => onAddContainer(container.type)}
+            key={element.type}
+            onClick={() => onAddElement(element.type)}
             style={{
               padding: '8px 12px',
               border: 'none',
@@ -49,7 +49,7 @@ const C4Toolbar = ({ onAddContainer }: C4ToolbarProps) => {
               e.currentTarget.style.background = '#f0f0f0';
             }}
           >
-            {container.label}
+            {element.label}
           </button>
         ))}
       </div>
@@ -57,4 +57,4 @@ const C4Toolbar = ({ onAddContainer }: C4ToolbarProps) => {
   );
 };
 
-export default memo(C4Toolbar); 
+export default memo(UMLToolbar); 
