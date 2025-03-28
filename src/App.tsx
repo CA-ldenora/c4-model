@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { ReactFlow, Background, Controls, MiniMap, Node, Edge, addEdge, useNodesState, useEdgesState, NodeTypes, Connection, EdgeTypes, MarkerType } from '@xyflow/react';
+import dagre from 'dagre';
 import C4Toolbar from './components/C4Toolbar';
 import UMLToolbar from './components/UMLToolbar';
 import { ActorNode, SistemaNode, ExSistemaNode, DatabaseNode, MobileNode, WebNode } from './Nodes/Nodes';
@@ -27,6 +28,7 @@ const nodeTypes: NodeTypes = {
 
 const edgeTypes: EdgeTypes = {
   uml: UMLEdge,
+  c4: UMLEdge,
 };
 
 const initialNodes: Node[] = [
@@ -231,11 +233,7 @@ const initialEdges: Edge[] = [
     id: 'e1-2', 
     source: 'actor-1', 
     target: 'web-1',
-    type: 'smoothstep',
-    data: { 
-      sourceLabel: '1',
-      targetLabel: 'n'
-    },
+    type: 'c4',
     markerEnd: {
       type: MarkerType.ArrowClosed,
       color: '#333',
@@ -249,11 +247,7 @@ const initialEdges: Edge[] = [
     id: 'e2-3', 
     source: 'web-1', 
     target: 'sistema-1',
-    type: 'smoothstep',
-    data: { 
-      sourceLabel: '1',
-      targetLabel: '1'
-    },
+    type: 'c4',
     markerEnd: {
       type: MarkerType.ArrowClosed,
       color: '#333',
@@ -267,11 +261,7 @@ const initialEdges: Edge[] = [
     id: 'e3-4', 
     source: 'sistema-1', 
     target: 'database-1',
-    type: 'smoothstep',
-    data: { 
-      sourceLabel: '1',
-      targetLabel: '1'
-    },
+    type: 'c4',
     markerEnd: {
       type: MarkerType.ArrowClosed,
       color: '#333',
@@ -286,7 +276,7 @@ const initialEdges: Edge[] = [
     id: 'bank-teller',
     source: 'bank',
     target: 'teller',
-    type: 'smoothstep',
+    type: 'uml',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+1..*'
@@ -303,7 +293,7 @@ const initialEdges: Edge[] = [
     id: 'bank-customer',
     source: 'bank',
     target: 'customer',
-    type: 'smoothstep',
+    type: 'uml',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+1..*'
@@ -320,7 +310,7 @@ const initialEdges: Edge[] = [
     id: 'customer-teller',
     source: 'customer',
     target: 'teller',
-    type: 'smoothstep',
+    type: 'uml',
     data: { 
       sourceLabel: '+1..*',
       targetLabel: '+1..*'
@@ -337,7 +327,7 @@ const initialEdges: Edge[] = [
     id: 'customer-account',
     source: 'customer',
     target: 'account',
-    type: 'smoothstep',
+    type: 'uml',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+1..*'
@@ -354,7 +344,7 @@ const initialEdges: Edge[] = [
     id: 'account-checking',
     source: 'account',
     target: 'checking',
-    type: 'smoothstep',
+    type: 'uml',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+1'
@@ -371,7 +361,7 @@ const initialEdges: Edge[] = [
     id: 'account-savings',
     source: 'account',
     target: 'savings',
-    type: 'smoothstep',
+    type: 'uml',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+1'
@@ -388,7 +378,7 @@ const initialEdges: Edge[] = [
     id: 'customer-loan',
     source: 'customer',
     target: 'loan',
-    type: 'smoothstep',
+    type: 'uml',
     data: { 
       sourceLabel: '+1',
       targetLabel: '+0..*'
@@ -405,19 +395,127 @@ const initialEdges: Edge[] = [
     id: 'e-order-payment',
     source: 'customer',
     target: 'interface-payment',
-    type: 'smoothstep',
+    type: 'uml',
     data: { 
-      sourceLabel: '1',
-      targetLabel: '1'
+      sourceLabel: '+1',
+      targetLabel: '+1'
     },
     markerEnd: {
       type: MarkerType.ArrowClosed,
       color: '#333',
       width: 20,
       height: 20,
-    }
+    },
+    style: { stroke: '#333' }
   }
 ];
+
+// Layout configuration
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+// Settings for the layout
+const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
+  // Create two separate graphs for C4 and UML
+  const c4Graph = new dagre.graphlib.Graph();
+  const umlGraph = new dagre.graphlib.Graph();
+  c4Graph.setDefaultEdgeLabel(() => ({}));
+  umlGraph.setDefaultEdgeLabel(() => ({}));
+
+  // Set the layout direction for both graphs
+  c4Graph.setGraph({ rankdir: direction });
+  umlGraph.setGraph({ rankdir: direction });
+
+  // Separate C4 and UML nodes
+  const c4Nodes = nodes.filter(node => 
+    ['actor', 'sistema', 'exSistema', 'database', 'mobile', 'web'].includes(node.type || '')
+  );
+  const umlNodes = nodes.filter(node => 
+    ['class', 'interface', 'enum', 'abstract', 'package', 'component'].includes(node.type || '')
+  );
+
+  // Add C4 nodes to their graph
+  c4Nodes.forEach((node) => {
+    c4Graph.setNode(node.id, { width: 180, height: 120 });
+  });
+
+  // Add UML nodes to their graph
+  umlNodes.forEach((node) => {
+    umlGraph.setNode(node.id, { width: 200, height: 150 });
+  });
+
+  // Separate edges for each graph
+  const c4Edges = edges.filter(edge => 
+    c4Nodes.some(node => node.id === edge.source) && 
+    c4Nodes.some(node => node.id === edge.target)
+  );
+
+  const umlEdges = edges.filter(edge => 
+    umlNodes.some(node => node.id === edge.source) && 
+    umlNodes.some(node => node.id === edge.target)
+  );
+
+  // Add edges to their respective graphs
+  c4Edges.forEach((edge) => {
+    c4Graph.setEdge(edge.source, edge.target);
+  });
+
+  umlEdges.forEach((edge) => {
+    umlGraph.setEdge(edge.source, edge.target);
+  });
+
+  // Calculate layouts
+  dagre.layout(c4Graph);
+  dagre.layout(umlGraph);
+
+  // Fixed starting positions
+  const c4StartX = 100;
+  const umlStartX = 800;
+  
+  // Get the layouted nodes
+  const layoutedNodes = nodes.map((node) => {
+    const isC4Node = c4Nodes.some(n => n.id === node.id);
+    const nodeWithPosition = isC4Node ? 
+      c4Graph.node(node.id) : 
+      umlGraph.node(node.id);
+    
+    if (!nodeWithPosition) {
+      return node;
+    }
+
+    return {
+      ...node,
+      position: {
+        x: isC4Node ? c4StartX : umlStartX + nodeWithPosition.x,
+        y: nodeWithPosition.y,
+      },
+    };
+  });
+
+  return { nodes: layoutedNodes, edges };
+};
+
+const getNewNodePosition = (type: string, nodes: Node[]): { x: number; y: number } => {
+  const isC4Node = ['actor', 'sistema', 'exSistema', 'database', 'mobile', 'web'].includes(type);
+  const similarNodes = nodes.filter(node => 
+    isC4Node ? 
+      ['actor', 'sistema', 'exSistema', 'database', 'mobile', 'web'].includes(node.type || '') :
+      ['class', 'interface', 'enum', 'abstract', 'package', 'component'].includes(node.type || '')
+  );
+
+  if (similarNodes.length === 0) {
+    return isC4Node ? { x: 100, y: 100 } : { x: 600, y: 100 };
+  }
+
+  // Find the lowest y position among similar nodes
+  const maxY = Math.max(...similarNodes.map(node => node.position.y));
+  const baseX = isC4Node ? 100 : 600;
+
+  return {
+    x: baseX,
+    y: maxY + 150 // Add some vertical spacing
+  };
+};
 
 function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -425,49 +523,63 @@ function App() {
 
   const onConnect = useCallback(
     (params: Connection) => {
+      const sourceNode = nodes.find(node => node.id === params.source);
+      const targetNode = nodes.find(node => node.id === params.target);
+      const isUMLConnection = sourceNode && targetNode && 
+        ['class', 'interface', 'enum', 'abstract', 'package', 'component'].includes(sourceNode.type || '') &&
+        ['class', 'interface', 'enum', 'abstract', 'package', 'component'].includes(targetNode.type || '');
+
       const newEdge: Edge = {
         id: `edge-${edges.length + 1}`,
         ...params,
-        type: 'uml',
-        data: { 
-          sourceLabel: '+1',
-          targetLabel: '+1'
-        },
+        type: isUMLConnection ? 'uml' : 'c4',
+        ...(isUMLConnection && {
+          data: { 
+            sourceLabel: '+1',
+            targetLabel: '+1'
+          }
+        }),
         markerEnd: {
           type: MarkerType.ArrowClosed,
           color: '#333',
           width: 20,
           height: 20,
-        }
+        },
+        style: { stroke: '#333' },
+        ...(isUMLConnection ? {} : { animated: true })
       };
+      
       setEdges((eds: Edge[]) => addEdge(newEdge, eds));
     },
-    [setEdges, edges.length]
+    [setEdges, edges.length, nodes]
   );
 
   const onAddContainer = useCallback(
     (type: string) => {
+      const position = getNewNodePosition(type, nodes);
       const newNode: Node = {
         id: `${type}-${nodes.length + 1}`,
         type,
-        position: { x: 100, y: 100 },
+        position,
         data: {
           title: `Nuovo ${type}`,
           type: type === 'actor' ? 'Persona' : 'Container',
           description: 'Aggiungi una descrizione',
         },
       };
+      
       setNodes((nds: Node[]) => [...nds, newNode]);
     },
-    [nodes.length, setNodes]
+    [nodes, setNodes]
   );
 
   const onAddUMLElement = useCallback(
     (type: string) => {
+      const position = getNewNodePosition(type, nodes);
       const newNode: Node = {
         id: `${type}-${nodes.length + 1}`,
         type,
-        position: { x: 500, y: 100 },
+        position,
         data: {
           title: `Nuovo ${type}`,
           type: type,
@@ -476,9 +588,10 @@ function App() {
           methods: ['+ metodo1()', '- metodo2(param: string)'],
         },
       };
+      
       setNodes((nds: Node[]) => [...nds, newNode]);
     },
-    [nodes.length, setNodes]
+    [nodes, setNodes]
   );
 
   return (
