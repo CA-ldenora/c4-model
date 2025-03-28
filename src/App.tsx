@@ -416,15 +416,14 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 
 // Settings for the layout
 const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
-  // Create two separate graphs for C4 and UML
-  const c4Graph = new dagre.graphlib.Graph();
-  const umlGraph = new dagre.graphlib.Graph();
-  c4Graph.setDefaultEdgeLabel(() => ({}));
-  umlGraph.setDefaultEdgeLabel(() => ({}));
+  const isHorizontal = direction === 'LR';
+  dagreGraph.setGraph({ rankdir: direction });
 
-  // Set the layout direction for both graphs
-  c4Graph.setGraph({ rankdir: direction });
-  umlGraph.setGraph({ rankdir: direction });
+  // Clear the graph before adding new nodes
+  const existingNodes = dagreGraph.nodes();
+  for (const node of existingNodes) {
+    dagreGraph.removeNode(node);
+  }
 
   // Separate C4 and UML nodes
   const c4Nodes = nodes.filter(node => 
@@ -435,38 +434,22 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
   );
 
   // Add C4 nodes to their graph
-  c4Nodes.forEach((node) => {
-    c4Graph.setNode(node.id, { width: 180, height: 120 });
-  });
+  for (const node of c4Nodes) {
+    dagreGraph.setNode(node.id, { width: 180, height: 120 });
+  }
 
   // Add UML nodes to their graph
-  umlNodes.forEach((node) => {
-    umlGraph.setNode(node.id, { width: 200, height: 150 });
-  });
+  for (const node of umlNodes) {
+    dagreGraph.setNode(node.id, { width: 200, height: 150 });
+  }
 
-  // Separate edges for each graph
-  const c4Edges = edges.filter(edge => 
-    c4Nodes.some(node => node.id === edge.source) && 
-    c4Nodes.some(node => node.id === edge.target)
-  );
+  // Add edges
+  for (const edge of edges) {
+    dagreGraph.setEdge(edge.source, edge.target);
+  }
 
-  const umlEdges = edges.filter(edge => 
-    umlNodes.some(node => node.id === edge.source) && 
-    umlNodes.some(node => node.id === edge.target)
-  );
-
-  // Add edges to their respective graphs
-  c4Edges.forEach((edge) => {
-    c4Graph.setEdge(edge.source, edge.target);
-  });
-
-  umlEdges.forEach((edge) => {
-    umlGraph.setEdge(edge.source, edge.target);
-  });
-
-  // Calculate layouts
-  dagre.layout(c4Graph);
-  dagre.layout(umlGraph);
+  // Calculate the layout
+  dagre.layout(dagreGraph);
 
   // Fixed starting positions
   const c4StartX = 100;
@@ -475,9 +458,7 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
   // Get the layouted nodes
   const layoutedNodes = nodes.map((node) => {
     const isC4Node = c4Nodes.some(n => n.id === node.id);
-    const nodeWithPosition = isC4Node ? 
-      c4Graph.node(node.id) : 
-      umlGraph.node(node.id);
+    const nodeWithPosition = dagreGraph.node(node.id);
     
     if (!nodeWithPosition) {
       return node;

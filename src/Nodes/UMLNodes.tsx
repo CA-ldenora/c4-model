@@ -11,122 +11,62 @@ interface UMLNodeProps {
   };
 }
 
-export const ClassNode = ({ data }: UMLNodeProps) => {
+const UMLNode = ({ data, className }: UMLNodeProps & { className?: string }) => {
   return (
-    <div className="uml-node class-node">
+    <div className={`uml-node ${className || ''}`}>
       <Handle type="target" position={Position.Top} />
-      <div className="uml-header">
-        <h3>{data.title}</h3>
+      <div className="uml-node-header">
+        {data.title}
       </div>
-      {data.attributes && data.attributes.length > 0 && (
-        <div className="uml-attributes">
-          {data.attributes.map((attr, index) => (
-            <div key={index}>{attr}</div>
-          ))}
-        </div>
-      )}
-      {data.methods && data.methods.length > 0 && (
-        <div className="uml-methods">
-          {data.methods.map((method, index) => (
-            <div key={index}>{method}</div>
-          ))}
-        </div>
-      )}
+      <div className="uml-node-content">
+        {data.attributes && data.attributes.length > 0 && (
+          <div className="uml-node-section">
+            <ul className="uml-node-attributes">
+              {data.attributes.map((attr, index) => (
+                <li key={index}>{attr}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {data.methods && data.methods.length > 0 && (
+          <div className="uml-node-section">
+            <ul className="uml-node-methods">
+              {data.methods.map((method, index) => (
+                <li key={index}>{method}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
       <Handle type="source" position={Position.Bottom} />
+      <Handle type="target" position={Position.Left} />
+      <Handle type="source" position={Position.Right} />
     </div>
   );
 };
 
-export const InterfaceNode = ({ data }: UMLNodeProps) => {
-  return (
-    <div className="uml-node interface-node">
-      <Handle type="target" position={Position.Top} />
-      <div className="uml-header">
-        <h3>{data.title}</h3>
-      </div>
-      {data.methods && data.methods.length > 0 && (
-        <div className="uml-methods">
-          {data.methods.map((method, index) => (
-            <div key={index}>{method}</div>
-          ))}
-        </div>
-      )}
-      <Handle type="source" position={Position.Bottom} />
-    </div>
-  );
-};
+export const ClassNode = (props: UMLNodeProps) => (
+  <UMLNode {...props} className="class" />
+);
 
-export const EnumNode = ({ data }: UMLNodeProps) => {
-  return (
-    <div className="uml-node enum-node">
-      <Handle type="target" position={Position.Top} />
-      <div className="uml-header">
-        <h3>{data.title}</h3>
-      </div>
-      {data.attributes && data.attributes.length > 0 && (
-        <div className="uml-attributes">
-          {data.attributes.map((attr, index) => (
-            <div key={index}>{attr}</div>
-          ))}
-        </div>
-      )}
-      <Handle type="source" position={Position.Bottom} />
-    </div>
-  );
-};
+export const InterfaceNode = (props: UMLNodeProps) => (
+  <UMLNode {...props} className="interface" />
+);
 
-export const AbstractNode = ({ data }: UMLNodeProps) => {
-  return (
-    <div className="uml-node abstract-node">
-      <Handle type="target" position={Position.Top} />
-      <div className="uml-header">
-        <h3>{data.title}</h3>
-      </div>
-      {data.attributes && data.attributes.length > 0 && (
-        <div className="uml-attributes">
-          {data.attributes.map((attr, index) => (
-            <div key={index}>{attr}</div>
-          ))}
-        </div>
-      )}
-      {data.methods && data.methods.length > 0 && (
-        <div className="uml-methods">
-          {data.methods.map((method, index) => (
-            <div key={index}>{method}</div>
-          ))}
-        </div>
-      )}
-      <Handle type="source" position={Position.Bottom} />
-    </div>
-  );
-};
+export const EnumNode = (props: UMLNodeProps) => (
+  <UMLNode {...props} className="enum" />
+);
 
-export const PackageNode = ({ data }: UMLNodeProps) => {
-  return (
-    <div className="uml-node package-node">
-      <Handle type="target" position={Position.Top} />
-      <div className="uml-header">
-        <h3>{data.title}</h3>
-      </div>
-      <div className="uml-content">
-        {data.description}
-      </div>
-      <Handle type="source" position={Position.Bottom} />
-    </div>
-  );
-};
+export const AbstractNode = (props: UMLNodeProps) => (
+  <UMLNode {...props} className="abstract" />
+);
 
-export const ComponentNode = ({ data }: UMLNodeProps) => {
-  return (
-    <div className="uml-node component-node">
-      <Handle type="target" position={Position.Top} />
-      <div className="uml-header">
-        <h3>{data.title}</h3>
-      </div>
-      <div className="uml-content">
-        {data.description}
-      </div>
-      <Handle type="source" position={Position.Bottom} />
-    </div>
-  );
-}; 
+export const PackageNode = (props: UMLNodeProps) => (
+  <UMLNode {...props} className="package" />
+);
+
+export const ComponentNode = (props: UMLNodeProps) => (
+  <UMLNode {...props} className="component" />
+);
+
+export default UMLNode; 

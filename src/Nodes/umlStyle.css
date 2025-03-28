@@ -1,10 +1,73 @@
 .uml-node {
-  background: white;
-  border: 1px solid #ccc;
+  border: 2px solid #333;
   border-radius: 4px;
-  padding: 10px;
-  min-width: 150px;
-  max-width: 300px;
+  background: white;
+  font-family: Arial, sans-serif;
+  width: 200px;
+  overflow: hidden;
+}
+
+.uml-node-header {
+  padding: 8px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 2px solid #333;
+}
+
+/* Different colors for different node types */
+.uml-node.class .uml-node-header {
+  background-color: #FFE082; /* Light yellow */
+}
+
+.uml-node.interface .uml-node-header {
+  background-color: #B39DDB; /* Light purple */
+}
+
+.uml-node.enum .uml-node-header {
+  background-color: #90CAF9; /* Light blue */
+}
+
+.uml-node.abstract .uml-node-header {
+  background-color: #EF9A9A; /* Light red */
+}
+
+.uml-node.package .uml-node-header {
+  background-color: #A5D6A7; /* Light green */
+}
+
+.uml-node.component .uml-node-header {
+  background-color: #CE93D8; /* Light pink */
+}
+
+.uml-node-content {
+  padding: 16px;
+  background: white;
+}
+
+.uml-node-section {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.uml-node-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.uml-node-attributes,
+.uml-node-methods {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.uml-node-attributes li,
+.uml-node-methods li {
+  font-size: 12px;
+  margin: 4px 0;
+  color: #333;
 }
 
 .uml-header {
